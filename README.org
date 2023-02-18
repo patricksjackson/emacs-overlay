@@ -111,15 +111,6 @@ required in a user's config via =use-package= or =leaf=.
         # `use-package-always-ensure` to `t` in your config.
         alwaysEnsure = true;
 
-        # For Org mode babel files, by default only code blocks with
-        # `:tangle yes` are considered. Setting `alwaysTangle` to `true`
-        # will include all code blocks missing the `:tangle` argument,
-        # defaulting it to `yes`.
-        # Note that this is NOT recommended unless you have something like
-        # `#+PROPERTY: header-args:emacs-lisp :tangle yes` in your config,
-        # which defaults `:tangle` to `yes`.
-        alwaysTangle = true;
-
         # Optionally provide extra packages not in the configuration file.
         extraEmacsPackages = epkgs: [
           epkgs.cask

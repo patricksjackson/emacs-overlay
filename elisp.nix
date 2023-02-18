@@ -16,8 +16,6 @@ in
 , defaultInitFile ? false
 # emulate `use-package-always-ensure` behavior (defaulting to false)
 , alwaysEnsure ? null
-# emulate `#+PROPERTY: header-args:emacs-lisp :tangle yes`
-, alwaysTangle ? false
 , extraEmacsPackages ? epkgs: [ ]
 , package ? pkgs.emacs
 , override ? (epkgs: epkgs)
@@ -41,16 +39,22 @@ let
     in
       type == "path" && ext == "org";
 
+  tangledOrgConfig = pkgs.runCommand "tangled-emacs-config" {} ''
+    cp ${config} init.org
+    ${package}/bin/emacs --batch --quick init.org --funcall org-babel-tangle
+    cp init.el $out
+  '';
+
   configText =
     let
       type = builtins.typeOf config;
     in
       if type == "string" then config
-      else if type == "path" then builtins.readFile config
+      else if type == "path" then builtins.readFile (if isOrgModeFile then tangledOrgConfig else config)
       else throw "Unsupported type for config: \"${type}\"";
 
   packages = parse.parsePackagesFromUsePackage {
-    inherit configText isOrgModeFile alwaysTangle;
+    inherit configText;
     alwaysEnsure = doEnsure;
   };
   emacsPackages = pkgs.emacsPackagesFor package;

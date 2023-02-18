@@ -1,7 +1,7 @@
 { pkgs, lib }:
 
 let
-  inherit (import ./repos/fromElisp { inherit pkgs; }) fromElisp fromOrgModeBabelElisp';
+  inherit (import ./repos/fromElisp { inherit pkgs; }) fromElisp;
 
   isStrEmpty = s: (builtins.replaceStrings [ " " ] [ "" ] s) == "";
 
@@ -72,16 +72,8 @@ let
   parsePackagesFromUsePackage = {
     configText
     , alwaysEnsure ? false
-    , isOrgModeFile ? false
-    , alwaysTangle ? false
   }:
     let
-      readFunction =
-        if isOrgModeFile then
-          fromOrgModeBabelElisp' { ":tangle" = if alwaysTangle then "yes" else "no"; }
-        else
-          fromElisp;
-
       find = item: list:
         if list == [] then [] else
           if builtins.head list == item then
@@ -147,7 +139,7 @@ let
         else
           [];
     in
-      lib.flatten (map recurse (readFunction configText));
+      lib.flatten (map recurse (fromElisp configText));
 
 in
 {
